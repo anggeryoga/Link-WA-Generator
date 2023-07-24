@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Link Generator</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="whatsapp.png">
+</head>
+
+<body>
+    <div class="form-container">
+        <label for="phoneNumber">Masukkan nomor telepon:</label>
+        <input type="text" id="phoneNumber" placeholder="Contoh: 085123456789">
+        <div class="warning" id="phoneNumberWarning"></div>
+
+        <label for="message">Tulis pesan Anda:</label>
+        <textarea id="message" placeholder="Tulis pesan Anda di sini..."></textarea>
+
+        <button onclick="generateWhatsAppLink()">Copy</button>
+
+        <label for="whatsappLink">Tautan WhatsApp:</label>
+        <input type="text" id="whatsappLink" readonly>
+
+        <div class="copy-notification" id="copyNotification">Teks telah disalin!</div>
+    </div>
+
+    <script>
+        // Fungsi untuk mengupdate tautan WhatsApp secara real-time
+        function updateWhatsAppLink() {
+            const phoneNumberInput = document.getElementById('phoneNumber').value.trim();
+            const phoneNumber = convertToIndonesiaFormat(phoneNumberInput);
+            const message = encodeURIComponent(document.getElementById('message').value.trim());
+
+            if (phoneNumber) {
+                const link = `https://wa.me/${phoneNumber}${message ? `?text=${message}` : ''}`;
+                document.getElementById('whatsappLink').value = link;
+                document.getElementById('phoneNumberWarning').textContent = '';
+            } else {
+                document.getElementById('whatsappLink').value = '';
+                document.getElementById('phoneNumberWarning').textContent = 'Mohon masukkan nomor telepon yang valid.';
+            }
+        }
+
+        // Fungsi untuk mengubah nomor telepon ke format kode negara Indonesia
+        function convertToIndonesiaFormat(phoneNumber) {
+            // Menghilangkan karakter non-digit dari nomor telepon
+            const digitsOnly = phoneNumber.replace(/\D/g, '');
+
+            // Cek apakah nomor telepon dimulai dengan '08' dan panjangnya tidak lebih dari 14 digit
+            if (/^08\d{0,14}$/.test(digitsOnly)) {
+                // Mengganti '08' di awal nomor dengan '628'
+                return '628' + digitsOnly.slice(2);
+            }
+            return ''; // Jika format nomor tidak sesuai, kembalikan string kosong
+        }
+
+        // Event listener untuk mendeteksi perubahan pada form nomor telepon dan pesan
+        document.getElementById('phoneNumber').addEventListener('input', updateWhatsAppLink);
+        document.getElementById('message').addEventListener('input', updateWhatsAppLink);
+
+        // Fungsi untuk menyalin tautan WhatsApp ke clipboard
+        function generateWhatsAppLink() {
+            const whatsappLink = document.getElementById('whatsappLink');
+            whatsappLink.select();
+            document.execCommand('copy');
+            showCopyNotification();
+        }
+
+        // Fungsi untuk menampilkan notifikasi copy berhasil
+        function showCopyNotification() {
+            const copyNotification = document.getElementById('copyNotification');
+            copyNotification.classList.add('show-notification');
+            setTimeout(() => {
+                copyNotification.classList.remove('show-notification');
+            }, 3000);
+        }
+    </script>
+</body>
+
+</html>
